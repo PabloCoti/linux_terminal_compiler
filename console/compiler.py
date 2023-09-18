@@ -1,4 +1,5 @@
 import re
+import subprocess
 from os import system
 
 static_commands = ['pwd', 'date', 'time', 'exit', 'clear', 'Man', 'uname -a']
@@ -41,14 +42,14 @@ def compile_dynamic_command(command):
 
 def compile_file_command(command, dynamic_command):
     if re.fullmatch(r'^\s*{}\s+([a-zA-Z0-9_./-]+\s*)$'.format(dynamic_command), command):
-        return run_command(command)
+        return run_powershell_command(command)
 
     else:
         return 'Error: Command not found.'
 
 def compile_ls(command):
     if re.fullmatch(r'^\s*ls(\s+-[al])?\s*$', command):
-        return run_command(command)
+        return run_powershell_command(command)
 
     else:
         return 'Error: Command not found.'
@@ -57,18 +58,25 @@ def compile_static_command(command):
     general_pattern = r'^\s*(\w+)\s*$'
     uname_pattern = r'^\s*uname\s*-a\s*$'
     if re.fullmatch(uname_pattern, command):
-        return run_command('ver')
+        return run_cmd_command('ver')
 
     elif re.fullmatch(general_pattern, command):
         expression = re.fullmatch(general_pattern, command)
         c_split = expression.group(1)
         command_index = static_commands.index(c_split)
         output_command = static_win_equivalent[command_index]
+        
+        if c_split == 'Man':
+            return run_powershell_command(output_command)
+        
+        return run_cmd_command(output_command)
 
-        return run_command(output_command)
 
     return 'Error: Command not found.'
 
 
-def run_command(command):
+def run_powershell_command(command):
+    return subprocess.run(["powershell", "-Command", command], capture_output=True)
+
+def run_cmd_command(command):
     return system(command)
