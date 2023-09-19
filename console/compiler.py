@@ -67,7 +67,7 @@ def compile_static_command(command):
         output_command = static_win_equivalent[command_index]
         
         if c_split == 'Man':
-            return run_powershell_command(output_command)
+            return "INSTRUCCIONES SOBRE EL USO DE LA APLICACION\n\nNOTA: esta aplicación simula una consola, por lo que ten en cuenta lo siguiente\n\n1. el comando cd emulara un cambio, el proceso no puede ser movido, sin embargo \nse trabajara sobre un path guardado en ram para futuras consultas\n\n2. algunos comandos no funcionan en linux y si en windows, ej. time\n\n------------------------------------------------------------\nCOMANDOS\n    pwd                 muestra el directorio actual, ten en cuenta que la ruta\n                        absoluta no cambiara, pues el proceso no puede cambiar de ruta\n                        pero las consultas que hagas con el programa si se veran reflejados\n                        el puntero será cambiado\n    date                muestra la fecha actual\n    time                muestra la hora actual en la computadora\n    exit                sale del programa\n    clear               limpia la pantalla (consola)\n    Man                 muestra un mensaje con instrucciones e información del programa\n    uname -a            muestra la versión del SO\n    cd <dir>            cambia el path sobre el que estamos trabajando\n    ls [opt] <dir>      muestra los elementos que hay en el directorio\n                        estamos haciendolo basados en linux, por lo que el comando ls no\n                        podra ser ejecutado en windows, es probable que muestre un error\n                        windows utiliza el comando dir\n    rm [files]          borra archivos\n                        files puede ser escrito como un archivo o como un path\n    mkdir <dir>         crea un folder con el nombre de <dir>\n    rmdir <dir>         elimina el folder con el nombre de <dir>, es probable que\n                        no permita borrar carpetas con elementos dentro"
         
         return run_cmd_command(output_command)
 
@@ -76,7 +76,9 @@ def compile_static_command(command):
 
 
 def run_powershell_command(command):
-    return subprocess.run(["powershell", "-Command", command], capture_output=True)
+    # result = subprocess.run(["powershell", "-Command", command], capture_output=True).stdout
+    result = subprocess.run(["powershell", "-Command", command], stdout=subprocess.PIPE, text=True)
+    return result.stdout
 
 def run_cmd_command(command):
     return system(command)
